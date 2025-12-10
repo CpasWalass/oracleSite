@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Oracle - Guide Interactif</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 4em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.5em;
+            font-weight: 300;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.3s backwards;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            animation: fadeIn 1s ease 0.5s backwards;
+        }
+        
+        .tab-btn {
+            padding: 18px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .tab-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .tab-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .tab-btn.active {
+            transform: scale(1.1);
+        }
+        
+        .tab-processus {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .tab-instance {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .tab-database {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .tab-flux {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #2c3e50;
+        }
+        
+        .content-section {
+            display: none;
+            animation: slideInUp 0.8s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card.instance::before {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .card.database::before {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+        
+        .card-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .card.instance .card-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .card.database .card-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .card-role {
+            color: #e74c3c;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            padding-left: 20px;
+            border-left: 3px solid #e74c3c;
+        }
+        
+        .card-details {
+            color: #555;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+        
+        .card-details strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .subsection-header {
+            font-size: 2em;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin: 50px 0 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .flow-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .flow-box {
+            padding: 25px 40px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 1.2em;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-box:hover {
+            transform: scale(1.1);
+        }
+        
+        .flow-box:nth-child(1) {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .flow-box:nth-child(3) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .flow-box:nth-child(5) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .flow-arrow {
+            font-size: 2.5em;
+            color: #e74c3c;
+            font-weight: bold;
+            animation: slideRight 1.5s infinite;
+        }
+        
+        .scenario {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .scenario:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .scenario-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .scenario-steps {
+            color: #555;
+            line-height: 2;
+            font-size: 1em;
+        }
+        
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .size-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .size-card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        
+        .size-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .size-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes slideRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .hero p {
+                font-size: 1.2em;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-btn {
+                padding: 15px 25px;
+                font-size: 1em;
+            }
+            
+            .flow-diagram {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🔷 Architecture Oracle 🔷</h1>
+        <p>Explorez l'architecture complète d'Oracle de manière interactive</p>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn tab-processus active" data-tab="processus">⚙️ Processus</button>
+            <button class="tab-btn tab-instance" data-tab="instance">💾 Instance</button>
+            <button class="tab-btn tab-database" data-tab="database">💿 Base de données</button>
+            <button class="tab-btn tab-flux" data-tab="flux">🔄 Flux & Interactions</button>
+        </div>
+        
+        <!-- SECTION PROCESSUS -->
+        <div class="content-section active" id="processus">
+            <div class="subsection-header">Processus d'arrière-plan</div>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">🔧</div> SMON</div>
+                    <div class="card-role">Récupération du système après une panne</div>
+                    <div class="card-details">
+                        • Effectue le rollback des transactions non validées<br>
+                        • Libère les segments temporaires inutilisés<br>
+                        • Fusionne les espaces libres contiguës
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">👁️</div> PMON</div>
+                    <div class="card-role">Surveille et nettoie les processus utilisateurs défaillants</div>
+                    <div class="card-details">
+                        • Libère les ressources (verrous, mémoire)<br>
+                        • Enregistre l'instance auprès du listener<br>
+                        • Nettoie le cache après une déconnexion anormale
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">✍️</div> DBWn</div>
+                    <div class="card-role">Écrit les blocs modifiés (dirty buffers) vers les fichiers de données</div>
+                    <div class="card-details">
+                        • Plusieurs processus possibles (DBW0, DBW1...)<br>
+                        • Déclenché lors de checkpoints ou quand le cache est plein<br>
+                        • Écriture asynchrone pour optimiser les performances
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">📝</div> LGWR</div>
+                    <div class="card-role">Écrit les entrées du redo log buffer vers les fichiers redo log</div>
+                    <div class="card-details">
+                        • Écriture synchrone lors des commits<br>
+                        • Écriture aussi quand le buffer est plein à 1/3<br>
+                        • <strong>Critique pour la récupération des données</strong>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">✅</div> CKPT</div>
+                    <div class="card-role">Signale les checkpoints et met à jour les en-têtes de fichiers</div>
+                    <div class="card-details">
+                        • Met à jour les fichiers de contrôle<br>
+                        • Synchronise l'état des fichiers de données<br>
+                        • Réduit le temps de récupération après panne
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">📦</div> ARCn</div>
+                    <div class="card-role">Archive les fichiers redo log remplis (mode ARCHIVELOG)</div>
+                    <div class="card-details">
+                        • Copie les redo logs vers un emplacement d'archive<br>
+                        • Permet la récupération complète<br>
+                        • Plusieurs processus possibles (ARC0, ARC1...)
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">🔄</div> RECO</div>
+                    <div class="card-role">Résout les transactions distribuées en échec</div>
+                    <div class="card-details">
+                        • Récupère automatiquement les transactions en attente<br>
+                        • Gère les transactions XA entre bases distantes
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">📊</div> MMON</div>
+                    <div class="card-role">Collecte les statistiques de performance</div>
+                    <div class="card-details">
+                        • Capture les données <strong>AWR</strong> (Automatic Workload Repository)<br>
+                        • Détecte les alertes système<br>
+                        • Effectue les snapshots automatiques
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">📈</div> MMNL</div>
+                    <div class="card-role">Écrit les statistiques ASH (Active Session History)</div>
+                    <div class="card-details">
+                        • Version légère de MMON<br>
+                        • Enregistre les sessions actives en temps réel
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">Processus serveurs</div>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">👤</div> Serveur Dédié</div>
+                    <div class="card-role">Un processus par connexion utilisateur</div>
+                    <div class="card-details">
+                        • Exécute les requêtes SQL de l'utilisateur<br>
+                        • Gère la PGA du client<br>
+                        • Retourne les résultats
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title"><div class="card-icon">👥</div> Serveur Partagé</div>
+                    <div class="card-role">Plusieurs utilisateurs partagent un pool de processus</div>
+                    <div class="card-details">
+                        • Utilise le dispatcher et les shared servers<br>
+                        • Réduit la consommation mémoire<br>
+                        • Convient aux environnements avec nombreuses connexions
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION INSTANCE -->
+        <div class="content-section" id="instance">
+            <div class="subsection-header">SGA (System Global Area) - Mémoire partagée</div>
+            <div class="card-grid">
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🗄️</div> Database Buffer Cache</div>
+                    <div class="card-role">Cache les blocs de données lus depuis les fichiers</div>
+                    <div class="card-details">
+                        • <strong>Default Pool</strong> : blocs standards<br>
+                        • <strong>Keep Pool</strong> : blocs fréquemment utilisés<br>
+                        • <strong>Recycle Pool</strong> : blocs rarement réutilisés<br>
+                        • Utilise l'algorithme <strong>LRU</strong> (Least Recently Used)
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🔗</div> Shared Pool</div>
+                    <div class="card-role">Cache le code SQL, PL/SQL et les métadonnées</div>
+                    <div class="card-details">
+                        • <strong>Library Cache</strong> : plans d'exécution SQL, code PL/SQL parsé<br>
+                        • <strong>Data Dictionary Cache</strong> : métadonnées des objets (tables, index, utilisateurs)<br>
+                        • <strong>Result Cache</strong> : résultats de requêtes SQL et fonctions PL/SQL
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🔁</div> Redo Log Buffer</div>
+                    <div class="card-role">Buffer circulaire pour les modifications avant écriture sur disque</div>
+                    <div class="card-details">
+                        • Stocke temporairement les vecteurs de changement<br>
+                        • Vidé par LGWR lors des commits<br>
+                        • Taille fixe définie au démarrage
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">📦</div> Large Pool</div>
+                    <div class="card-role">Mémoire pour opérations volumineuses</div>
+                    <div class="card-details">
+                        • Utilisé par <strong>RMAN</strong> pour les sauvegardes<br>
+                        • Sessions serveur partagé (UGA)<br>
+                        • Opérations parallèles<br>
+                        • Évite la fragmentation du Shared Pool
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">☕</div> Java Pool</div>
+                    <div class="card-role">Exécution du code Java dans la base</div>
+                    <div class="card-details">
+                        • Stocke les objets Java<br>
+                        • Utilise la JVM intégrée à Oracle<br>
+                        • Nécessaire pour certaines fonctionnalités Oracle
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🌊</div> Streams Pool</div>
+                    <div class="card-role">Support pour Oracle Streams (réplication)</div>
+                    <div class="card-details">
+                        • Gère les files d'attente de messages<br>
+                        • Utilisé par Advanced Queuing<br>
+                        • Réplication de données entre bases
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🔒</div> Fixed SGA</div>
+                    <div class="card-role">Informations système internes</div>
+                    <div class="card-details">
+                        • Variables d'état de l'instance<br>
+                        • Pointeurs vers d'autres composants SGA<br>
+                        • Taille fixe et non modifiable
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">PGA (Program Global Area) - Mémoire privée</div>
+            <div class="card-grid">
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">⚙️</div> SQL Work Area</div>
+                    <div class="card-role">Espace de travail pour opérations SQL complexes</div>
+                    <div class="card-details">
+                        • <strong>Sort Area</strong> : tris en mémoire (ORDER BY, GROUP BY)<br>
+                        • <strong>Hash Area</strong> : jointures hash et agrégations<br>
+                        • <strong>Bitmap Merge Area</strong> : fusion d'index bitmap<br>
+                        • Géré automatiquement par <strong>PGA_AGGREGATE_TARGET</strong>
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">👤</div> Session Memory</div>
+                    <div class="card-role">Informations spécifiques à la session</div>
+                    <div class="card-details">
+                        • Variables de session<br>
+                        • Informations de connexion<br>
+                        • Contexte de sécurité utilisateur
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">🔐</div> Private SQL Area</div>
+                    <div class="card-role">Zone privée pour le curseur SQL</div>
+                    <div class="card-details">
+                        • <strong>Persistent Area</strong> : informations de liaison (bind variables)<br>
+                        • <strong>Runtime Area</strong> : état d'exécution et résultats partiels<br>
+                        • Libérée à la fermeture du curseur
+                    </div>
+                </div>
+                
+                <div class="card instance">
+                    <div class="card-title"><div class="card-icon">📚</div> Stack Space</div>
+                    <div class="card-role">Pile d'exécution pour variables et appels de fonctions</div>
+                    <div class="card-details">
+                        • Variables locales PL/SQL<br>
+                        • Paramètres de procédures<br>
+                        • Gestion des appels récursifs
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION BASE DE DONNÉES -->
+        <div class="content-section" id="database">
+            <div class="subsection-header">Fichiers de contrôle (Control Files)</div>
+            <div class="card-grid">
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📄</div> Nature</div>
+                    <div class="card-role">Fichier binaire critique pour le démarrage</div>
+                    <div class="card-details">
+                        • Nom de la base de données<br>
+                        • Horodatage de création<br>
+                        • Informations sur les tablespaces
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📋</div> Multiplicité</div>
+                    <div class="card-role">Toujours multiplexé (2 à 3 copies minimum)</div>
+                    <div class="card-details">
+                        • Localisation de tous les fichiers de données<br>
+                        • Localisation des redo logs<br>
+                        • Informations de checkpoint actuelles
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🔄</div> Mise à jour</div>
+                    <div class="card-role">Continuellement mis à jour par Oracle</div>
+                    <div class="card-details">
+                        • Historique des sauvegardes RMAN<br>
+                        • Numéros de séquence des archives<br>
+                        • Structure physique de la base
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">⚠️</div> Criticité</div>
+                    <div class="card-role">Perte = base non démarrable</div>
+                    <div class="card-details">
+                        • Récupération uniquement par reconstruction<br>
+                        • Sauvegarde automatique recommandée
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">Fichiers redo log (Redo Log Files)</div>
+            <div class="card-grid">
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📝</div> Nature</div>
+                    <div class="card-role">Enregistrement séquentiel de toutes les modifications</div>
+                    <div class="card-details">
+                        • Vecteurs de changement (change vectors)<br>
+                        • Données permettant de rejouer les transactions<br>
+                        • Informations de commit/rollback
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🔁</div> Organisation</div>
+                    <div class="card-role">Fonctionnement en groupes circulaires</div>
+                    <div class="card-details">
+                        • Minimum 2 groupes de redo logs<br>
+                        • Chaque groupe
+                        <div class="card database">
+                    <div class="card-title"><div class="card-icon">🔁</div> Organisation</div>
+                    <div class="card-role">Fonctionnement en groupes circulaires</div>
+                    <div class="card-details">
+                        • Minimum 2 groupes de redo logs<br>
+                        • Chaque groupe contient 1 ou plusieurs membres (multiplexage)<br>
+                        • LGWR bascule (switch) entre les groupes
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📦</div> Mode ARCHIVELOG</div>
+                    <div class="card-role">Archivage automatique avant écrasement</div>
+                    <div class="card-details">
+                        • Copie des logs remplis vers archives<br>
+                        • Permet la récupération point-in-time<br>
+                        • Obligatoire pour la haute disponibilité
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🚫</div> Mode NOARCHIVELOG</div>
+                    <div class="card-role">Pas d'archivage, logs écrasés</div>
+                    <div class="card-details">
+                        • Récupération limitée au dernier backup<br>
+                        • Utilisé seulement en développement/test
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🛡️</div> Rôle</div>
+                    <div class="card-role">Garantit la durabilité des transactions (ACID)</div>
+                    <div class="card-details">
+                        • Récupération après panne instance<br>
+                        • Récupération après crash<br>
+                        • Réplication avec Data Guard
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">Fichiers de données (Data Files)</div>
+            <div class="card-grid">
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">💾</div> Nature</div>
+                    <div class="card-role">Stockage physique des données et index</div>
+                    <div class="card-details">
+                        • <strong>Blocs Oracle</strong> : unité de base (généralement 8 Ko)<br>
+                        • <strong>Extents</strong> : groupes de blocs contigus<br>
+                        • <strong>Segments</strong> : ensemble d'extents pour un objet
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🗂️</div> Tablespaces</div>
+                    <div class="card-role">Regroupement logique de fichiers</div>
+                    <div class="card-details">
+                        • <strong>SYSTEM</strong> : dictionnaire de données, objets système<br>
+                        • <strong>SYSAUX</strong> : données auxiliaires (AWR, APEX, etc.)<br>
+                        • <strong>USERS</strong> : objets utilisateurs par défaut<br>
+                        • <strong>TEMP</strong> : espaces de tri temporaires<br>
+                        • <strong>UNDO</strong> : données d'annulation pour rollback
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📊</div> Types de segments</div>
+                    <div class="card-role">Différents types d'objets stockés</div>
+                    <div class="card-details">
+                        • <strong>Tables</strong> : données des tables<br>
+                        • <strong>Index</strong> : structures d'indexation<br>
+                        • <strong>LOB</strong> : Large Objects (CLOB, BLOB)<br>
+                        • <strong>Partitions</strong> : sous-divisions de tables/index
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">⚙️</div> Gestion</div>
+                    <div class="card-role">Auto-extensible ou taille fixe</div>
+                    <div class="card-details">
+                        • Extension automatique possible (AUTOEXTEND ON)<br>
+                        • Taille maximale définissable (MAXSIZE)<br>
+                        • Redimensionnement manuel possible
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🔐</div> Protection</div>
+                    <div class="card-role">Peut être sauvegardé à chaud (mode ARCHIVELOG)</div>
+                    <div class="card-details">
+                        • Backup RMAN avec base ouverte<br>
+                        • Restauration granulaire par tablespace<br>
+                        • Point-in-time recovery possible
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">Fichiers auxiliaires</div>
+            <div class="card-grid">
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">⚙️</div> Fichier de paramètres</div>
+                    <div class="card-role">Configuration de l'instance (PFILE/SPFILE)</div>
+                    <div class="card-details">
+                        • <strong>PFILE</strong> : fichier texte (init.ora)<br>
+                        • <strong>SPFILE</strong> : fichier binaire persistant (recommandé)<br>
+                        • Contient tailles mémoire, chemins, paramètres système
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">🔑</div> Fichier de mots de passe</div>
+                    <div class="card-role">Authentification SYSDBA/SYSOPER</div>
+                    <div class="card-details">
+                        • Permet connexion administrative à distance<br>
+                        • Stocke les credentials privilégiés<br>
+                        • Nom par défaut : orapw&lt;SID&gt;
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">📋</div> Fichiers d'alerte et trace</div>
+                    <div class="card-role">Journalisation et diagnostic</div>
+                    <div class="card-details">
+                        • <strong>Alert Log</strong> : journal des événements importants<br>
+                        • <strong>Trace Files</strong> : diagnostics détaillés des erreurs<br>
+                        • Localisation définie par DIAGNOSTIC_DEST
+                    </div>
+                </div>
+                
+                <div class="card database">
+                    <div class="card-title"><div class="card-icon">💿</div> Fichiers d'archive</div>
+                    <div class="card-role">Copies des redo logs remplis</div>
+                    <div class="card-details">
+                        • Séquence numérique continue<br>
+                        • Stockage sur disque ou bande<br>
+                        • Nécessaires pour récupération complète
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION FLUX & INTERACTIONS -->
+        <div class="content-section" id="flux">
+            <div class="subsection-header">Architecture globale</div>
+            <div class="flow-container">
+                <h3 style="text-align: center; color: #2c3e50; font-size: 1.8em; margin-bottom: 30px;">
+                    🔄 Flux de traitement des requêtes
+                </h3>
+                <div class="flow-diagram">
+                    <div class="flow-box">👤 UTILISATEUR</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">PROCESSUS SERVEUR</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">INSTANCE (SGA + PGA)</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">BASE DE DONNÉES</div>
+                </div>
+            </div>
+            
+            <div class="subsection-header">Scénarios d'exécution</div>
+            
+            <div class="scenario">
+                <div class="scenario-title">📖 Flux typique d'une requête SELECT</div>
+                <div class="scenario-steps">
+                    <strong>1.</strong> Le processus serveur reçoit la requête SQL<br>
+                    <strong>2.</strong> Vérifie le <strong>Shared Pool</strong> pour un plan d'exécution existant (soft parse)<br>
+                    <strong>3.</strong> Lit les blocs nécessaires depuis le <strong>Database Buffer Cache</strong><br>
+                    <strong>4.</strong> Si absent du cache → lecture depuis les fichiers de données (hard read)<br>
+                    <strong>5.</strong> Traite les données dans la <strong>PGA</strong> (tris, jointures, agrégations)<br>
+                    <strong>6.</strong> Retourne le résultat à l'utilisateur
+                </div>
+            </div>
+            
+            <div class="scenario">
+                <div class="scenario-title">✏️ Flux typique d'une modification (INSERT/UPDATE/DELETE)</div>
+                <div class="scenario-steps">
+                    <strong>1.</strong> Modification effectuée dans le <strong>Database Buffer Cache</strong> (bloc devient "dirty")<br>
+                    <strong>2.</strong> Génération d'entrées <strong>UNDO</strong> (pour annulation) dans le tablespace UNDO<br>
+                    <strong>3.</strong> Génération d'entrées <strong>REDO</strong> (pour rejeu) dans le Redo Log Buffer<br>
+                    <strong>4.</strong> Au <strong>COMMIT</strong> : <strong>LGWR</strong> écrit le Redo Log Buffer sur disque (redo logs)<br>
+                    <strong>5.</strong> Transaction validée et confirmée à l'utilisateur<br>
+                    <strong>6.</strong> Plus tard : <strong>DBWn</strong> écrit les blocs modifiés vers les fichiers de données
+                </div>
+            </div>
+            
+            <div class="scenario">
+                <div class="scenario-title">🔧 Récupération après panne (Instance Crash)</div>
+                <div class="scenario-steps">
+                    <strong>1.</strong> Au redémarrage, <strong>SMON</strong> détecte une récupération nécessaire<br>
+                    <strong>2.</strong> <strong>Phase ROLL FORWARD</strong> : rejoue toutes les modifications des redo logs<br>
+                    <strong>3.</strong> Restauration de l'état au moment du crash<br>
+                    <strong>4.</strong> <strong>Phase ROLL BACK</strong> : annule les transactions non committées (via UNDO)<br>
+                    <strong>5.</strong> Base de données cohérente et prête à l'usage<br>
+                    <strong>6.</strong> <strong>PMON</strong> nettoie les ressources des sessions interrompues
+                </div>
+            </div>
+            
+            <div class="scenario">
+                <div class="scenario-title">💾 Checkpoint et synchronisation</div>
+                <div class="scenario-steps">
+                    <strong>1.</strong> <strong>CKPT</strong> signale un checkpoint (automatique ou manuel)<br>
+                    <strong>2.</strong> <strong>DBWn</strong> écrit tous les blocs modifiés (dirty buffers) sur disque<br>
+                    <strong>3.</strong> <strong>CKPT</strong> met à jour les en-têtes des fichiers de données<br>
+                    <strong>4.</strong> <strong>CKPT</strong> met à jour les fichiers de contrôle<br>
+                    <strong>5.</strong> Marque le point de synchronisation dans les redo logs<br>
+                    <strong>6.</strong> Réduit le temps de récupération en cas de panne future
+                </div>
+            </div>
+            
+            <div class="subsection-header">Tailles typiques (environnement production)</div>
+            <div class="sizes-grid">
+                <div class="size-card">
+                    <div class="size-label">💾 SGA Totale</div>
+                    <div class="size-value">4-32 GB</div>
+                </div>
+                
+                <div class="size-card">
+                    <div class="size-label">🧠 PGA Totale</div>
+                    <div class="size-value">1-8 GB</div>
+                </div>
+                
+                <div class="size-card">
+                    <div class="size-label">🗄️ Buffer Cache</div>
+                    <div class="size-value">60-70% SGA</div>
+                </div>
+                
+                <div class="size-card">
+                    <div class="size-label">🔗 Shared Pool</div>
+                    <div class="size-value">20-30% SGA</div>
+                </div>
+                
+                <div class="size-card">
+                    <div class="size-label">📝 Redo Logs (par groupe)</div>
+                    <div class="size-value">100 MB - 1 GB</div>
+                </div>
+                
+                <div class="size-card">
+                    <div class="size-label">💿 Fichiers de données</div>
+                    <div class="size-value">GB → TB</div>
+                </div>
+            </div>
+            
+            <div class="flow-container" style="margin-top: 50px;">
+                <h3 style="text-align: center; color: #2c3e50; font-size: 1.8em; margin-bottom: 20px;">
+                    🎯 Points clés à retenir
+                </h3>
+                <div style="color: #555; line-height: 2.2; font-size: 1.05em;">
+                    <strong style="color: #667eea;">✓</strong> L'<strong>Instance</strong> (SGA + PGA) est la mémoire, volatile au redémarrage<br>
+                    <strong style="color: #f093fb;">✓</strong> La <strong>Base de données</strong> (fichiers) est le stockage persistant sur disque<br>
+                    <strong style="color: #4facfe;">✓</strong> Les <strong>Processus</strong> sont les travailleurs qui font le lien entre les deux<br>
+                    <strong style="color: #667eea;">✓</strong> <strong>LGWR</strong> garantit la durabilité (COMMIT = écriture redo logs)<br>
+                    <strong style="color: #f093fb;">✓</strong> <strong>DBWn</strong> optimise les performances (écriture asynchrone différée)<br>
+                    <strong style="color: #4facfe;">✓</strong> <strong>CKPT</strong> + <strong>SMON</strong> = récupération rapide après panne<br>
+                    <strong style="color: #667eea;">✓</strong> <strong>Mode ARCHIVELOG</strong> = récupération complète point-in-time possible<br>
+                    <strong style="color: #f093fb;">✓</strong> Les <strong>fichiers de contrôle</strong> sont critiques → toujours multiplexés !
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Gestion des onglets
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const contentSections = document.querySelectorAll('.content-section');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Retirer active de tous
+                tabBtns.forEach(b => b.classList.remove('active'));
+                contentSections.forEach(s => s.classList.remove('active'));
+                
+                // Activer l'onglet cliqué
+                btn.classList.add('active');
+                const targetTab = btn.getAttribute('data-tab');
+                document.getElementById(targetTab).classList.add('active');
+                
+                // Smooth scroll vers le haut
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        
+        // Animation au scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.card, .scenario, .flow-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
